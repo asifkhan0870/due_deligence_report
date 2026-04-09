@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Startup Report AI</title>
+
+<style>
+
+body {
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color:white;
+}
+
+/* NAV */
+nav {
+    padding:20px;
+    font-size:22px;
+    color:#38bdf8;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+/* CONTAINER */
+.container {
+    max-width:1200px;
+    margin:auto;
+    padding:30px;
+}
+
+/* GLASS CARD */
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+/* BUTTON */
+button {
+    background: linear-gradient(135deg,#38bdf8,#0ea5e9);
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:disabled {
+    opacity:0.5;
+}
+
+/* REPORT GRID */
+.report-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+    gap:12px;
+}
+
+.report-card {
+    background: rgba(255,255,255,0.04);
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    position:relative;
+    transition:0.3s;
+}
+
+.report-card:hover {
+    transform:scale(1.03);
+    border:1px solid #38bdf8;
+}
+
+.report-card input {
+    position:absolute;
+    right:10px;
+    top:10px;
+}
+
+.group-title {
+    margin:15px 0;
+    color:#7dd3fc;
+}
+
+/* OUTPUT */
+.output-card {
+    padding:10px;
+    background:#0f172a;
+    margin-top:10px;
+    border-radius:8px;
+}
+
+/* FULL LOADER */
+#loaderOverlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(2,6,23,0.95);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+    opacity:0;
+    pointer-events:none;
+    transition:0.3s;
+}
+
+#loaderOverlay.active {
+    opacity:1;
+    pointer-events:all;
+}
+
+.spinner {
+    width:70px;
+    height:70px;
+    border:6px solid rgba(255,255,255,0.1);
+    border-top:6px solid #38bdf8;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform:rotate(360deg); }
+}
+
+#loaderText {
+    margin-top:15px;
+    color:#7dd3fc;
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>🚀 Startup Report AI</nav>
+
+<div class="container">
+
+<div class="card">
+<h3>Upload File</h3>
+<input type="file" id="file"><br><br>
+<button onclick="upload()">Upload</button>
+</div>
+
+<div class="card">
+<h3>Select Reports</h3>
+<div id="reports"></div><br>
+<button onclick="generate()">Generate Reports</button>
+</div>
+
+<div class="card">
+<h3>Output</h3>
+<div id="output"></div>
+</div>
+
+</div>
+
+<!-- LOADER -->
+<div id="loaderOverlay">
+<div class="spinner"></div>
+<p id="loaderText">Analyzing your startup...</p>
+</div>
+
+<script>
+
+let sessionId = null;
+
+/* LOAD REPORTS */
+async function loadReports(){
+let res = await fetch("http://localhost:8000/reports");
+let data = await res.json();
+
+let container = document.getElementById("reports");
+
+for(let group in data){
+
+let section = document.createElement("div");
+section.innerHTML = `<h4 class="group-title">${group}</h4>`;
+
+let grid = document.createElement("div");
+grid.className="report-grid";
+
+data[group].forEach(r=>{
+let card = document.createElement("label");
+card.className="report-card";
+
+card.innerHTML = `
+<input type="checkbox" value="${r}">
+${r.replaceAll("_"," ")}
+`;
+
+grid.appendChild(card);
+});
+
+section.appendChild(grid);
+container.appendChild(section);
+}
+}
+
+loadReports();
+
+/* UPLOAD */
+async function upload(){
+let file=document.getElementById("file").files[0];
+
+let fd=new FormData();
+fd.append("file",file);
+
+let res=await fetch("http://localhost:8000/upload",{method:"POST",body:fd});
+let data=await res.json();
+
+sessionId=data.session_id;
+alert("Uploaded");
+}
+
+/* GENERATE */
+async function generate(){
+
+if(!sessionId){
+alert("Upload first");
+return;
+}
+
+let selected=document.querySelectorAll("input:checked");
+let reports=Array.from(selected).map(r=>r.value);
+
+const loader=document.getElementById("loaderOverlay");
+const output=document.getElementById("output");
+
+loader.classList.add("active");
+
+/* 🔥 MINIMUM LOADER TIME FIX */
+const startTime = Date.now();
+
+let res=await fetch("http://localhost:8000/generate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+session_id:sessionId,
+reports:reports
+})
+});
+
+let data=await res.json();
+
+/* ⏳ Ensure at least 2.5 sec loader */
+const elapsed = Date.now() - startTime;
+const remaining = 2500 - elapsed;
+
+if (remaining > 0) {
+    await new Promise(r => setTimeout(r, remaining));
+}
+
+loader.classList.remove("active");
+
+/* OUTPUT */
+output.innerHTML="";
+
+data.files.forEach(file=>{
+output.innerHTML+=`
+<div class="output-card">
+<a href="http://localhost:8000/${file}">📄 ${file}</a>
+</div>`;
+});
+
+output.innerHTML+=`<br><a href="http://localhost:8000/${data.zip}">📦 Download ZIP</a>`;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+fastapi
+uvicorn[standard]
+python-multipart
+aiofiles
+
+# PDF + parsing
+pdfplumber
+reportlab
+weasyprint
+
+# AI
+anthropic
+
+# utils
+pydantic
+python-dotenv
+jinja2
+
+# optional but recommended
+requests
