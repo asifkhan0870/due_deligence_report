@@ -10,7 +10,6 @@ from app.services.pdf_generator import create_pdf
 from app.services.zip_service import create_zip
 from app.routes.upload import DATA_STORE
 
-# 🔥 NEW IMPORT
 from app.data.reports_config import REPORTS, CATEGORY_SECTIONS
 
 router = APIRouter()
@@ -18,17 +17,14 @@ router = APIRouter()
 
 # ✅ SMART SECTION RESOLVER
 def get_sections_for_report(report_name):
-    report_key = report_name.lower()
-
-    # Normalize (important for underscores)
-    report_key = report_key.replace(" ", "_")
+    report_key = report_name.lower().replace(" ", "_")
 
     for category, reports in REPORTS.items():
         if report_key in reports:
             print(f"📊 Matched category: {category}")
             return CATEGORY_SECTIONS.get(category, [])
 
-    # 🔁 fallback (dynamic)
+    # 🔁 fallback
     print("⚠️ Using fallback sections")
 
     readable_name = report_name.replace("_", " ").title()
@@ -56,6 +52,7 @@ async def generate(data: dict):
     if not deck_text:
         return {"error": "No data found"}
 
+    # ✅ STORAGE PATH (keep outputs/)
     folder = f"outputs/{session_id}"
     os.makedirs(folder, exist_ok=True)
 
@@ -66,25 +63,20 @@ async def generate(data: dict):
         print(f"\n🚀 Generating report: {report}")
 
         try:
-            # ✅ GET DYNAMIC SECTIONS
             sections = get_sections_for_report(report)
 
             tasks = []
 
-            # ✅ CREATE TASKS PER SECTION
             for section in sections:
                 print(f"➡️ Queueing section: {section}")
-
                 prompt = build_section_prompt(f"{report} - {section}", deck_text)
                 tasks.append(generate_report_async(prompt))
 
-            # ✅ RUN IN PARALLEL
             print("⚡ Running all sections in parallel...")
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
             report_html = ""
 
-            # ✅ HANDLE RESULTS
             for idx, result in enumerate(results):
                 section_name = sections[idx]
 
@@ -95,13 +87,11 @@ async def generate(data: dict):
                     print(f"✅ Completed section: {section_name}")
                     report_html += result + "\n"
 
-            # ✅ CREATE PDF
             print(f"📄 Creating PDF for {report}")
 
             safe_name = report.replace(" ", "_")
             pdf_path = f"{folder}/{safe_name}.pdf"
 
-            # 🔥 PASS REPORT NAME FOR TITLE
             create_pdf(report_html, pdf_path, report)
 
             print(f"✅ PDF created: {pdf_path}")
@@ -117,7 +107,11 @@ async def generate(data: dict):
 
     print("✅ ZIP ready:", zip_path)
 
+    # 🔥 FINAL FIX: CLEAN PATHS (remove 'outputs/')
+    clean_files = [file.replace("outputs/", "") for file in generated_files]
+    clean_zip = zip_path.replace("outputs/", "")
+
     return {
-        "files": generated_files,
-        "zip": zip_path
+        "files": clean_files,
+        "zip": clean_zip
     }
