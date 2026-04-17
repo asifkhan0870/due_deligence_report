@@ -1,8 +1,8 @@
 import anthropic
 import asyncio
-from app.config import CLAUDE_API_KEY
+from app.config import ANTHROPIC_API_KEY
 
-client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
+client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 async def generate_report_async(prompt):
     loop = asyncio.get_event_loop()
