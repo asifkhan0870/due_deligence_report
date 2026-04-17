@@ -22,7 +22,8 @@ app.include_router(generate.router)
 app.include_router(reports.router)
 
 # Paths
-BASE_DIR = os.getcwd()
+BASE_DIR = os.path.dirname(os.getcwd())  # go up one level
+
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 
