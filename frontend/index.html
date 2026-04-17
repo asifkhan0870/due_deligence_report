@@ -4,7 +4,6 @@
 <title>Startup Report AI</title>
 
 <style>
-
 body {
     margin:0;
     font-family: 'Segoe UI', sans-serif;
@@ -12,7 +11,6 @@ body {
     color:white;
 }
 
-/* NAV */
 nav {
     padding:20px;
     font-size:22px;
@@ -20,14 +18,12 @@ nav {
     border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-/* CONTAINER */
 .container {
     max-width:1200px;
     margin:auto;
     padding:30px;
 }
 
-/* GLASS CARD */
 .card {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(15px);
@@ -37,7 +33,6 @@ nav {
     border:1px solid rgba(255,255,255,0.1);
 }
 
-/* BUTTON */
 button {
     background: linear-gradient(135deg,#38bdf8,#0ea5e9);
     border:none;
@@ -48,11 +43,8 @@ button {
     font-weight:bold;
 }
 
-button:disabled {
-    opacity:0.5;
-}
+button:disabled { opacity:0.5; }
 
-/* REPORT GRID */
 .report-grid {
     display:grid;
     grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
@@ -84,7 +76,6 @@ button:disabled {
     color:#7dd3fc;
 }
 
-/* OUTPUT */
 .output-card {
     padding:10px;
     background:#0f172a;
@@ -92,7 +83,6 @@ button:disabled {
     border-radius:8px;
 }
 
-/* FULL LOADER */
 #loaderOverlay {
     position:fixed;
     top:0;
@@ -132,7 +122,6 @@ button:disabled {
     margin-top:15px;
     color:#7dd3fc;
 }
-
 </style>
 </head>
 
@@ -161,7 +150,6 @@ button:disabled {
 
 </div>
 
-<!-- LOADER -->
 <div id="loaderOverlay">
 <div class="spinner"></div>
 <p id="loaderText">Analyzing your startup...</p>
@@ -173,13 +161,12 @@ let sessionId = null;
 
 /* LOAD REPORTS */
 async function loadReports(){
-let res = await fetch("http://localhost:8000/reports");
+let res = await fetch("/reports");
 let data = await res.json();
 
 let container = document.getElementById("reports");
 
 for(let group in data){
-
 let section = document.createElement("div");
 section.innerHTML = `<h4 class="group-title">${group}</h4>`;
 
@@ -209,10 +196,15 @@ loadReports();
 async function upload(){
 let file=document.getElementById("file").files[0];
 
+if(!file){
+alert("Please select a file");
+return;
+}
+
 let fd=new FormData();
 fd.append("file",file);
 
-let res=await fetch("http://localhost:8000/upload",{method:"POST",body:fd});
+let res=await fetch("/upload",{method:"POST",body:fd});
 let data=await res.json();
 
 sessionId=data.session_id;
@@ -235,10 +227,9 @@ const output=document.getElementById("output");
 
 loader.classList.add("active");
 
-/* 🔥 MINIMUM LOADER TIME FIX */
 const startTime = Date.now();
 
-let res=await fetch("http://localhost:8000/generate",{
+let res=await fetch("/generate",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -249,7 +240,6 @@ reports:reports
 
 let data=await res.json();
 
-/* ⏳ Ensure at least 2.5 sec loader */
 const elapsed = Date.now() - startTime;
 const remaining = 2500 - elapsed;
 
@@ -259,17 +249,16 @@ if (remaining > 0) {
 
 loader.classList.remove("active");
 
-/* OUTPUT */
 output.innerHTML="";
 
 data.files.forEach(file=>{
 output.innerHTML+=`
 <div class="output-card">
-<a href="http://localhost:8000/${file}">📄 ${file}</a>
+<a href="/outputs/${file}" target="_blank">📄 ${file}</a>
 </div>`;
 });
 
-output.innerHTML+=`<br><a href="http://localhost:8000/${data.zip}">📦 Download ZIP</a>`;
+output.innerHTML+=`<br><a href="/outputs/${data.zip}" target="_blank">📦 Download ZIP</a>`;
 }
 
 </script>
