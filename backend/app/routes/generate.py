@@ -52,8 +52,10 @@ async def generate(data: dict):
     if not deck_text:
         return {"error": "No data found"}
 
-    # ✅ STORAGE PATH (keep outputs/)
-    folder = f"outputs/{session_id}"
+    # ✅ FIXED PATH (IMPORTANT)
+    BASE_DIR = os.path.dirname(os.getcwd())  # go to project root
+    folder = os.path.join(BASE_DIR, "outputs", session_id)
+
     os.makedirs(folder, exist_ok=True)
 
     generated_files = []
@@ -90,11 +92,13 @@ async def generate(data: dict):
             print(f"📄 Creating PDF for {report}")
 
             safe_name = report.replace(" ", "_")
-            pdf_path = f"{folder}/{safe_name}.pdf"
+            pdf_path = os.path.join(folder, f"{safe_name}.pdf")
 
             create_pdf(report_html, pdf_path, report)
 
-            print(f"✅ PDF created: {pdf_path}")
+            # ✅ DEBUG (optional but useful)
+            print("📁 Exists:", os.path.exists(pdf_path))
+            print("📍 Path:", pdf_path)
 
             generated_files.append(pdf_path)
 
@@ -107,9 +111,13 @@ async def generate(data: dict):
 
     print("✅ ZIP ready:", zip_path)
 
-    # 🔥 FINAL FIX: CLEAN PATHS (remove 'outputs/')
-    clean_files = [file.replace("outputs/", "") for file in generated_files]
-    clean_zip = zip_path.replace("outputs/", "")
+    # ✅ CLEAN PATHS (remove absolute + outputs/)
+    clean_files = [
+        file.replace(f"{BASE_DIR}/outputs/", "").replace("outputs/", "")
+        for file in generated_files
+    ]
+
+    clean_zip = zip_path.replace(f"{BASE_DIR}/outputs/", "").replace("outputs/", "")
 
     return {
         "files": clean_files,
