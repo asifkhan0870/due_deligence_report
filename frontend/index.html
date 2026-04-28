@@ -1,267 +1,748 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Startup Report AI</title>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Startup Report AI</title>
 
-<style>
-body {
-    margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #020617, #0f172a);
-    color:white;
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #020617;
+        --card: rgba(15, 23, 42, 0.75);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --primary: #38bdf8;
+        --primary2: #0ea5e9;
+        --success: #22c55e;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(56, 189, 248, 0.15), transparent 25%),
+          radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.12), transparent 30%),
+          var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      nav {
+        width: 100%;
+        padding: 24px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(18px);
+        background: rgba(2, 6, 23, 0.7);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+      }
+
+      .logo img{
+        border-radius: 35px;
+        height: 100px;
+        width: 100px;
+  
+  margin-right: 10px;
 }
 
-nav {
-    padding:20px;
-    font-size:22px;
-    color:#38bdf8;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-}
+      .logo span {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-.container {
-    max-width:1200px;
-    margin:auto;
-    padding:30px;
-}
+      .nav-badge {
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: #7dd3fc;
+        font-size: 14px;
+      }
 
-.card {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(15px);
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:20px;
-    border:1px solid rgba(255,255,255,0.1);
-}
+      .container {
+        width: 95%;
+        max-width: 1450px;
+        margin: 35px auto;
+      }
 
-button {
-    background: linear-gradient(135deg,#38bdf8,#0ea5e9);
-    border:none;
-    padding:12px 20px;
-    border-radius:10px;
-    color:white;
-    cursor:pointer;
-    font-weight:bold;
-}
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
 
-button:disabled { opacity:0.5; }
+      .hero-card,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        backdrop-filter: blur(18px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+      }
 
-.report-grid {
-    display:grid;
-    grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
-    gap:12px;
-}
+      .hero-card {
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+      }
 
-.report-card {
-    background: rgba(255,255,255,0.04);
-    padding:12px;
-    border-radius:10px;
-    cursor:pointer;
-    position:relative;
-    transition:0.3s;
-}
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(56, 189, 248, 0.08);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+      }
 
-.report-card:hover {
-    transform:scale(1.03);
-    border:1px solid #38bdf8;
-}
+      .hero h1 {
+        font-size: 52px;
+        line-height: 1.1;
+        margin-bottom: 16px;
+      }
 
-.report-card input {
-    position:absolute;
-    right:10px;
-    top:10px;
-}
+      .hero h1 span {
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-.group-title {
-    margin:15px 0;
-    color:#7dd3fc;
-}
+      .hero p {
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 16px;
+        max-width: 650px;
+      }
 
-.output-card {
-    padding:10px;
-    background:#0f172a;
-    margin-top:10px;
-    border-radius:8px;
-}
+      .stats {
+        margin-top: 30px;
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
 
-#loaderOverlay {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(2,6,23,0.95);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    z-index:9999;
-    opacity:0;
-    pointer-events:none;
-    transition:0.3s;
-}
+      .stat-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 18px;
+        padding: 18px 22px;
+        min-width: 150px;
+      }
 
-#loaderOverlay.active {
-    opacity:1;
-    pointer-events:all;
-}
+      .stat-box h2 {
+        font-size: 28px;
+        margin-bottom: 4px;
+      }
 
-.spinner {
-    width:70px;
-    height:70px;
-    border:6px solid rgba(255,255,255,0.1);
-    border-top:6px solid #38bdf8;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-}
+      .stat-box p {
+        font-size: 13px;
+        color: var(--muted);
+      }
 
-@keyframes spin {
-    to { transform:rotate(360deg); }
-}
+      .upload-card {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
 
-#loaderText {
-    margin-top:15px;
-    color:#7dd3fc;
-}
-</style>
-</head>
+      .upload-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
 
-<body>
+      .upload-subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
 
-<nav>🚀 Startup Report AI</nav>
+      .upload-area {
+        border: 2px dashed rgba(56, 189, 248, 0.35);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        transition: 0.3s;
+      }
 
-<div class="container">
+      .upload-area:hover {
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.05);
+      }
 
-<div class="card">
-<h3>Upload File</h3>
-<input type="file" id="file"><br><br>
-<button onclick="upload()">Upload</button>
-</div>
+      input[type="file"] {
+        width: 100%;
+        margin-bottom: 18px;
+        color: white;
+      }
 
-<div class="card">
-<h3>Select Reports</h3>
-<div id="reports"></div><br>
-<button onclick="generate()">Generate Reports</button>
-</div>
+      .btn {
+        background: linear-gradient(135deg, var(--primary), var(--primary2));
+        border: none;
+        padding: 14px 22px;
+        border-radius: 14px;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 15px;
+      }
 
-<div class="card">
-<h3>Output</h3>
-<div id="output"></div>
-</div>
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(14, 165, 233, 0.25);
+      }
 
-</div>
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-<div id="loaderOverlay">
-<div class="spinner"></div>
-<p id="loaderText">Analyzing your startup...</p>
-</div>
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+      }
 
-<script>
+      .card {
+        padding: 28px;
+      }
 
-let sessionId = null;
+      .section-title {
+        font-size: 26px;
+        margin-bottom: 8px;
+      }
 
-/* LOAD REPORTS */
-async function loadReports(){
-let res = await fetch("/reports");
-let data = await res.json();
+      .section-subtitle {
+        color: var(--muted);
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
 
-let container = document.getElementById("reports");
+      .group {
+        margin-bottom: 34px;
+      }
 
-for(let group in data){
-let section = document.createElement("div");
-section.innerHTML = `<h4 class="group-title">${group}</h4>`;
+      .group-title {
+        margin-bottom: 18px;
+        font-size: 20px;
+        color: #7dd3fc;
+      }
 
-let grid = document.createElement("div");
-grid.className="report-grid";
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 16px;
+      }
 
-data[group].forEach(r=>{
-let card = document.createElement("label");
-card.className="report-card";
+      .report-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 18px;
+        padding: 18px;
+        cursor: pointer;
+        transition: 0.3s ease;
+        overflow: hidden;
+      }
 
-card.innerHTML = `
-<input type="checkbox" value="${r}">
-${r.replaceAll("_"," ")}
-`;
+      .report-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.5);
+        background: rgba(56, 189, 248, 0.06);
+      }
 
-grid.appendChild(card);
-});
+      .report-card input {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        transform: scale(1.2);
+      }
 
-section.appendChild(grid);
-container.appendChild(section);
-}
-}
+      .report-name {
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.5;
+        padding-right: 25px;
+      }
 
-loadReports();
+      .side-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
 
-/* UPLOAD */
-async function upload(){
-let file=document.getElementById("file").files[0];
+      .generate-box {
+        text-align: center;
+      }
 
-if(!file){
-alert("Please select a file");
-return;
-}
+      .generate-btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+      }
 
-let fd=new FormData();
-fd.append("file",file);
+      .status-box {
+        margin-top: 18px;
+        background: rgba(34, 197, 94, 0.08);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        padding: 14px;
+        border-radius: 14px;
+        color: #86efac;
+        display: none;
+      }
 
-let res=await fetch("/upload",{method:"POST",body:fd});
-let data=await res.json();
+      .output-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
 
-sessionId=data.session_id;
-alert("Uploaded");
-}
+      .output-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 16px;
+        border-radius: 16px;
+        transition: 0.3s;
+      }
 
-/* GENERATE */
-async function generate(){
+      .output-card:hover {
+        border-color: rgba(56, 189, 248, 0.4);
+      }
 
-if(!sessionId){
-alert("Upload first");
-return;
-}
+      .output-card a {
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+        word-break: break-word;
+      }
 
-let selected=document.querySelectorAll("input:checked");
-let reports=Array.from(selected).map(r=>r.value);
+      .zip-download {
+        margin-top: 18px;
+      }
 
-const loader=document.getElementById("loaderOverlay");
-const output=document.getElementById("output");
+      .zip-download a {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        padding: 14px;
+        border-radius: 14px;
+        font-weight: 700;
+      }
 
-loader.classList.add("active");
+      #loaderOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.94);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+      }
 
-const startTime = Date.now();
+      #loaderOverlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
 
-let res=await fetch("/generate",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-session_id:sessionId,
-reports:reports
-})
-});
+      .spinner {
+        width: 90px;
+        height: 90px;
+        border: 6px solid rgba(255, 255, 255, 0.08);
+        border-top: 6px solid #38bdf8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
 
-let data=await res.json();
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-const elapsed = Date.now() - startTime;
-const remaining = 2500 - elapsed;
+      #loaderText {
+        margin-top: 24px;
+        color: #7dd3fc;
+        font-size: 18px;
+      }
 
-if (remaining > 0) {
-    await new Promise(r => setTimeout(r, remaining));
-}
 
-loader.classList.remove("active");
+      .footer {
+      margin-top: 60px;
+      /* background: rgba(255, 255, 255, 0.04); */
+      /* border-top: 1px solid rgba(255, 255, 255, 0.08); */
+      padding: 30px 40px 20px;
+      backdrop-filter: blur(12px);
+    }
 
-output.innerHTML="";
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-data.files.forEach(file=>{
-output.innerHTML+=`
-<div class="output-card">
-<a href="/outputs/${file}" target="_blank">📄 ${file}</a>
-</div>`;
-});
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-output.innerHTML+=`<br><a href="/outputs/${data.zip}" target="_blank">📦 Download ZIP</a>`;
-}
+    .footer-brand img {
+      width: 50px;
+      border-radius: 12px;
+    }
 
-</script>
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
 
-</body>
+    .footer-links a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .footer-bottom {
+      margin-top: 20px;
+      text-align: center;
+      color: gray;
+    }
+
+
+
+      @media (max-width: 1100px) {
+        .hero,
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .hero h1 {
+          font-size: 38px;
+        }
+
+        nav {
+          padding: 18px 20px;
+        }
+
+        .container {
+          width: 92%;
+        }
+
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+
+        
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav>
+      <div class="logo">
+        <img src="/static/logo.png" width="38" />
+        <span>The Hashmi Group</span>
+      </div>
+    
+      <div class="nav-badge">
+        AI Powered Intelligence
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="hero">
+        <div class="hero-card">
+          <h1>
+            Generate <span>Investor Ready</span><br />
+            Startup Reports in Minutes
+          </h1>
+
+          <p>
+            Upload your startup documents, select professional business reports,
+            and instantly generate strategic insights, market analysis,
+            valuation reports, due diligence, and investor-ready PDFs powered by AI.
+          </p>
+
+          <div class="stats">
+            <div class="stat-box">
+              <h2>50+</h2>
+              <p>Business Reports</p>
+            </div>
+
+            <div class="stat-box">
+              <h2>AI</h2>
+              <p>Powered Analysis</p>
+            </div>
+
+            <div class="stat-box">
+              <h2>PDF</h2>
+              <p>Instant Export</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-card upload-card">
+          <div class="upload-title">Upload Startup Deck</div>
+
+          <div class="upload-subtitle">
+            Upload your pitch deck, startup profile, or company PDF to begin generating reports.
+          </div>
+
+          <div class="upload-area">
+            <input type="file" id="file" />
+            <button class="btn" onclick="upload()">Upload File</button>
+
+            <div class="status-box" id="uploadStatus">
+              ✅ File uploaded successfully
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="card">
+          <h2 class="section-title">Select Reports</h2>
+          <p class="section-subtitle">
+            Choose the reports you want to generate for your startup analysis.
+          </p>
+
+          <div id="reports"></div>
+        </div>
+
+        <div class="side-panel">
+          <div class="card generate-box">
+            <h3 style="margin-bottom: 12px">Generate Reports</h3>
+
+            <p
+              style="
+                color: #94a3b8;
+                margin-bottom: 24px;
+                font-size: 14px;
+                line-height: 1.6;
+              "
+            >
+              Generate professional AI-powered startup reports and download them instantly.
+            </p>
+
+            <button class="btn generate-btn" onclick="generate()">
+              Generate Reports
+            </button>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 18px">Generated Files</h3>
+
+            <div class="output-list" id="output"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loaderOverlay">
+      <div class="spinner"></div>
+      <p id="loaderText">
+        Please wait, generating your reports...
+      </p>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+    
+        <div class="footer-brand">
+          <img src="/static/logo.png" />
+          <div>
+            <h3>The Hashmi Group</h3>
+            <p>AI Powered Startup Intelligence</p>
+          </div>
+        </div>
+    
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="#">Reports</a>
+          <a href="mailto:khanasif0870@gmail.com">Contact</a>
+        </div>
+    
+      </div>
+    
+      <div class="footer-bottom">
+        © 2026 The Hashmi Group
+      </div>
+    </footer>
+
+    <script>
+      let sessionId = null;
+
+      /* LOAD REPORTS */
+      async function loadReports() {
+        let res = await fetch("/reports");
+        let data = await res.json();
+
+        let container = document.getElementById("reports");
+
+        for (let group in data) {
+          let section = document.createElement("div");
+          section.className = "group";
+
+          section.innerHTML = `
+            <h3 class="group-title">${group}</h3>
+          `;
+
+          let grid = document.createElement("div");
+          grid.className = "report-grid";
+
+          data[group].forEach((r) => {
+            let card = document.createElement("label");
+            card.className = "report-card";
+
+            card.innerHTML = `
+              <input type="checkbox" value="${r}" />
+              <div class="report-name">
+                ${r.replaceAll("_", " ")}
+              </div>
+            `;
+
+            grid.appendChild(card);
+          });
+
+          section.appendChild(grid);
+          container.appendChild(section);
+        }
+      }
+
+      loadReports();
+
+      /* UPLOAD */
+      async function upload() {
+        let file = document.getElementById("file").files[0];
+
+        if (!file) {
+          alert("Please select a file");
+          return;
+        }
+
+        let fd = new FormData();
+        fd.append("file", file);
+
+        let res = await fetch("/upload", {
+          method: "POST",
+          body: fd,
+        });
+
+        let data = await res.json();
+
+        sessionId = data.session_id;
+
+        document.getElementById("uploadStatus").style.display = "block";
+      }
+
+      /* GENERATE */
+      async function generate() {
+        if (!sessionId) {
+          alert("Upload file first");
+          return;
+        }
+
+        let selected = document.querySelectorAll(
+          '.report-card input:checked'
+        );
+
+        let reports = Array.from(selected).map((r) => r.value);
+
+        if (reports.length === 0) {
+          alert("Please select at least one report");
+          return;
+        }
+
+        const loader = document.getElementById("loaderOverlay");
+        const output = document.getElementById("output");
+
+        loader.classList.add("active");
+
+        try {
+          let res = await fetch("/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              reports: reports,
+            }),
+          });
+
+          let data = await res.json();
+
+          loader.classList.remove("active");
+
+          output.innerHTML = "";
+
+          if (data.files) {
+            data.files.forEach((file) => {
+              output.innerHTML += `
+                <div class="output-card">
+                  <a href="/outputs/${file}" target="_blank">
+                    📄 ${file.split("/").pop()}
+                  </a>
+                </div>
+              `;
+            });
+          }
+
+          if (data.zip) {
+            output.innerHTML += `
+              <div class="zip-download">
+                <a href="/outputs/${data.zip}" target="_blank">
+                  📦 Download ZIP File
+                </a>
+              </div>
+            `;
+          }
+        } catch (err) {
+          loader.classList.remove("active");
+          alert("Something went wrong while generating reports");
+          console.log(err);
+        }
+      }
+    </script>
+  </body>
 </html>

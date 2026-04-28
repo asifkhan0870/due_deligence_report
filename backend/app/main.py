@@ -31,7 +31,12 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Serve static frontend assets if any
-app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+# Serve static assets
+app.mount(
+    "/static",
+    StaticFiles(directory=os.path.join(FRONTEND_DIR, "static")),
+    name="static"
+)
 
 # Serve generated files
 app.mount("/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
